@@ -36,19 +36,45 @@ class TodoService
         return $todo;
     }
 
-    public function update()
+    public function update($id)
     {
+        $todo = $this->dm->getRepository(Todo::class)->find($id);
+        if (!$todo) {
+            throw new NotFoundHttpException('Todo not found');
+        }
+        //TODO: update with PATCH method.
     }
 
-    public function toggleDone()
+    public function delete($id)
     {
+        $todo = $this->dm->getRepository(Todo::class)->find($id);
+        if (!$todo) {
+            throw new NotFoundHttpException('Todo not found');
+        }
+        $this->dm->remove($todo);
+        $this->dm->flush();
     }
 
-    public function search()
+    public function markDone($id)
     {
+        $todo = $this->dm->getRepository(Todo::class)->find($id);
+        if (!$todo) {
+            throw new NotFoundHttpException('Todo not found');
+        }
+        $todo->setDone(true);
+        $this->dm->flush();
     }
-
-    public function filter()
+    public function markUndone($id)
     {
+        $todo = $this->dm->getRepository(Todo::class)->find($id);
+        if (!$todo) {
+            throw new NotFoundHttpException('Todo not found');
+        }
+        $todo->setDone(false);
+        $this->dm->flush();
+    }
+    public function filterByPriority($priority)
+    {
+        return $this->dm->getRepository(Todo::class)->findBy(["priority" => strtolower($priority)]);
     }
 }
