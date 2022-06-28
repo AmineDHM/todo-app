@@ -5,7 +5,7 @@ namespace App\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @ODM\Document(repositoryClass="App\Repository\TodoRepository") */
+/** @ODM\Document */
 class Todo
 {
     /** @ODM\Id */
@@ -29,6 +29,11 @@ class Todo
      * @Assert\Choice({"low", "meduim", "high"})
      */
     private $priority;
+
+    /** @ODM\Field(type="string")
+     * @Assert\NotBlank(message = "Description is required")
+     */
+    private $color;
 
     public function __construct()
     {
@@ -118,6 +123,26 @@ class Todo
     public function setPriority($priority)
     {
         $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of color
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    /**
+     * Set the value of color
+     *
+     * @return  self
+     */
+    public function setColor($color)
+    {
+        $this->color = $color;
 
         return $this;
     }

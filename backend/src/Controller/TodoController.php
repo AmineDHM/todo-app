@@ -8,13 +8,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/todo", name="todo")
  */
-class TestController extends AbstractController
+class TodoController extends AbstractController
 {
     private $todoService;
 
@@ -29,19 +30,12 @@ class TestController extends AbstractController
     public function create(Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
     {
         $todo = $serializer->deserialize($request->getContent(), Todo::class, 'json');
-
         $errors = $validator->validate($todo);
-
         if (count($errors) > 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
-
         $this->todoService->create($todo);
-
-        return $this->json(
-            ["messge" => "Todo created!", "data" => $todo],
-            Response::HTTP_CREATED
-        );
+        return $this->json($todo, Response::HTTP_CREATED);
     }
 
     /**
@@ -56,10 +50,24 @@ class TestController extends AbstractController
     /**
      * @Route("/get/{id}", name="todo", methods={"GET"})
      */
-    public function getById($id): Response
+    public function getById(Todo $todo): Response
     {
-        $todo = $this->todoService->getById($id);
         return $this->json($todo, Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/update/{id}", name="update", methods={"PATCH"})
+     */
+    public function update(Todo $todo, Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
+    {
+        $body = $request->getContent();
+        $updatedTodo = $serializer->deserialize($body, Todo::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $todo]);
+        $errors = $validator->validate($todo);
+        if (count($errors) > 0) {
+            return $this->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+        $this->todoService->update();
+        return $this->json($updatedTodo);
     }
 
     /**
@@ -73,29 +81,13 @@ class TestController extends AbstractController
     }
 
     /**
-     * @Route("/done/{id}", name="marKDone", methods={"PATCH"})
-     */
-    public function markDone($id): Response
-    {
-        $this->todoService->markDone($id);
-        return $this->json(["message" => "Todo marked as done"], Response::HTTP_OK);
-    }
-
-    /**
-     * @Route("/undone/{id}", name="markUndone", methods={"PATCH"})
-     */
-    public function markUndone($id): Response
-    {
-        $this->todoService->markUndone($id);
-        return $this->json(["message" => "Todo marked as undone"], Response::HTTP_OK);
-    }
-
-    /**
      * @Route("/delete/{id}", name="delete", methods={"DELETE"})
      */
-    public function delete($id): Response
+    public function delete(Todo $todo): Response
     {
-        $this->todoService->delete($id);
+        $this->todoService->deleteOne($todo);
         return $this->json(["message" => "Todo deleted"], Response::HTTP_OK);
     }
+
+    // TODO : Expose deleteMany()
 }

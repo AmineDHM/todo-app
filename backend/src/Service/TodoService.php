@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Document\Todo;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TodoService
 {
@@ -27,52 +26,26 @@ class TodoService
         return $this->dm->getRepository(Todo::class)->findAll();
     }
 
-    public function getById($id)
+    public function update()
     {
-        $todo = $this->dm->getRepository(Todo::class)->find($id);
-        if (!$todo) {
-            throw new NotFoundHttpException('Todo not found');
-        }
-        return $todo;
+        $this->dm->flush();
     }
 
-    public function update($id)
+    public function deleteOne($todo)
     {
-        $todo = $this->dm->getRepository(Todo::class)->find($id);
-        if (!$todo) {
-            throw new NotFoundHttpException('Todo not found');
-        }
-        //TODO: update with PATCH method.
-    }
-
-    public function delete($id)
-    {
-        $todo = $this->dm->getRepository(Todo::class)->find($id);
-        if (!$todo) {
-            throw new NotFoundHttpException('Todo not found');
-        }
         $this->dm->remove($todo);
         $this->dm->flush();
     }
 
-    public function markDone($id)
+    public function deleteMany($todosId)
     {
-        $todo = $this->dm->getRepository(Todo::class)->find($id);
-        if (!$todo) {
-            throw new NotFoundHttpException('Todo not found');
+        foreach ($todosId as $id) {
+            $todo = $this->dm->getRepository(Todo::class)->find($id);
+            $this->dm->remove($todo);
         }
-        $todo->setDone(true);
         $this->dm->flush();
     }
-    public function markUndone($id)
-    {
-        $todo = $this->dm->getRepository(Todo::class)->find($id);
-        if (!$todo) {
-            throw new NotFoundHttpException('Todo not found');
-        }
-        $todo->setDone(false);
-        $this->dm->flush();
-    }
+
     public function filterByPriority($priority)
     {
         return $this->dm->getRepository(Todo::class)->findBy(["priority" => strtolower($priority)]);
