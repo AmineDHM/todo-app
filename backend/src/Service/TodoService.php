@@ -21,8 +21,15 @@ class TodoService
         $this->dm->flush();
     }
 
-    public function getAll()
+    public function getAll($sortBy = null, $order)
     {
+        if ($sortBy != null) {
+            $todos = $this->dm->createQueryBuilder(Todo::class)
+                ->sort($sortBy, $order)
+                ->getQuery()
+                ->execute();
+            return $todos;
+        }
         return $this->dm->getRepository(Todo::class)->findAll();
     }
 
@@ -37,10 +44,14 @@ class TodoService
         $this->dm->flush();
     }
 
-    public function deleteMany($todosId)
+    public function delete($todosId)
     {
         foreach ($todosId as $id) {
             $todo = $this->dm->getRepository(Todo::class)->find($id);
+            // Skip not found todos.
+            if (!$todo) {
+                continue;
+            }
             $this->dm->remove($todo);
         }
         $this->dm->flush();
@@ -48,6 +59,6 @@ class TodoService
 
     public function filterByPriority($priority)
     {
-        return $this->dm->getRepository(Todo::class)->findBy(["priority" => strtolower($priority)]);
+        return $this->dm->getRepository(Todo::class)->findBy(['priority' => $priority]);
     }
 }

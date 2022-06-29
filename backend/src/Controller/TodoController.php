@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Document\Todo;
+use App\Dto\TodosId;
 use App\Service\TodoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,9 +42,11 @@ class TodoController extends AbstractController
     /**
      * @Route("/get", name="todos", methods={"GET"})
      */
-    public function getAll(): Response
+    public function getAll(Request $request): Response
     {
-        $todos = $this->todoService->getAll();
+        $sortBy = $request->query->get('sortBy');
+        $order = $request->query->get('order');
+        $todos = $this->todoService->getAll($sortBy, $order ? $order : 'desc');
         return $this->json($todos, Response::HTTP_OK);
     }
 
@@ -81,13 +84,12 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="delete", methods={"DELETE"})
+     * @Route("/delete", name="delete", methods={"DELETE"})
      */
-    public function delete(Todo $todo): Response
+    public function delete(Request $request, SerializerInterface $serializer): Response
     {
-        $this->todoService->deleteOne($todo);
-        return $this->json(["message" => "Todo deleted"], Response::HTTP_OK);
+        $todosId = $serializer->deserialize($request->getContent(), TodosId::class, 'json');
+        $this->todoService->delete($todosId->getIds());
+        return $this->json(["message" => "Selected todos are deleted"], Response::HTTP_OK);
     }
-
-    // TODO : Expose deleteMany()
 }

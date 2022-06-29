@@ -3,9 +3,12 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\PrePersist;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @ODM\Document */
+/** @ODM\Document
+ * @ODM\HasLifecycleCallbacks
+ */
 class Todo
 {
     /** @ODM\Id */
@@ -24,9 +27,13 @@ class Todo
     /** @ODM\Field(type="boolean") */
     private $done = false;
 
-    /** @ODM\Field(type="string")
+    /** @ODM\Field(type="int")
      * @Assert\NotBlank(message = "Priority is required")
-     * @Assert\Choice({"low", "meduim", "high"})
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 2,
+     *      notInRangeMessage = "Priority must be between {{ min }} and {{ max }}.",
+     * )
      */
     private $priority;
 
@@ -35,9 +42,8 @@ class Todo
      */
     private $color;
 
-    public function __construct()
-    {
-    }
+    /** @ODM\Field(type="date") */
+    private $createdAt;
 
     /**
      * Get the value of id
@@ -145,5 +151,31 @@ class Todo
         $this->color = $color;
 
         return $this;
+    }
+
+    /**
+     * Get the value of createdAt
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set the value of createdAt
+     *
+     * @return  self
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /** @ODM\PrePersist */
+    public function PrePersist(): void
+    {
+        $this->createdAt = new \DateTime();
     }
 }
