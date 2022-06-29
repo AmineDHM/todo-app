@@ -26,7 +26,7 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="new", methods={"POST"})
+     * @Route("", name="create", methods={"POST"})
      */
     public function create(Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
     {
@@ -40,7 +40,7 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/get", name="todos", methods={"GET"})
+     * @Route("", name="fetchAll", methods={"GET"})
      */
     public function getAll(Request $request): Response
     {
@@ -51,7 +51,7 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/get/{id}", name="todo", methods={"GET"})
+     * @Route("/get/{id}", name="fetchById", methods={"GET"})
      */
     public function getById(Todo $todo): Response
     {
@@ -59,7 +59,7 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/update/{id}", name="update", methods={"PATCH"})
+     * @Route("/{id}", name="update", methods={"PATCH"})
      */
     public function update(Todo $todo, Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
     {
@@ -69,7 +69,7 @@ class TodoController extends AbstractController
         if (count($errors) > 0) {
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
-        $this->todoService->update();
+        $this->todoService->update($updatedTodo);
         return $this->json($updatedTodo);
     }
 
@@ -78,13 +78,13 @@ class TodoController extends AbstractController
      */
     public function filter(Request $request): Response
     {
-        $priority = $request->query->get('priority');
-        $todos = $this->todoService->filterByPriority($priority);
+        $status = $request->query->get('status');
+        $todos = $this->todoService->filterByStatus($status);
         return $this->json($todos, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/delete", name="delete", methods={"DELETE"})
+     * @Route("", name="delete", methods={"DELETE"})
      */
     public function delete(Request $request, SerializerInterface $serializer): Response
     {

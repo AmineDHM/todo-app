@@ -15,50 +15,41 @@ class TodoService
         $this->dm = $dm;
     }
 
-    public function create(Todo $todo)
+    public function create(Todo $todo): void
     {
         $this->dm->persist($todo);
         $this->dm->flush();
     }
 
-    public function getAll($sortBy = null, $order)
+    public function getAll(string $sortBy = null, string $order): array
     {
         if ($sortBy != null) {
-            $todos = $this->dm->createQueryBuilder(Todo::class)
+            //return $todoRepository->fetchAndSortAllTodos($sortBy, $order);
+            return $this->dm->getRepository(Todo::class)->createQueryBuilder()
                 ->sort($sortBy, $order)
                 ->getQuery()
-                ->execute();
-            return $todos;
+                ->execute()
+                ->toArray();
         }
         return $this->dm->getRepository(Todo::class)->findAll();
     }
 
-    public function update()
+    public function update($todo): void
     {
         $this->dm->flush();
     }
 
-    public function deleteOne($todo)
+    public function delete(array $todosId): void
     {
-        $this->dm->remove($todo);
-        $this->dm->flush();
-    }
-
-    public function delete($todosId)
-    {
-        foreach ($todosId as $id) {
-            $todo = $this->dm->getRepository(Todo::class)->find($id);
-            // Skip not found todos.
-            if (!$todo) {
-                continue;
-            }
+        $todos = $this->dm->getRepository(Todo::class)->findBy(['id' => ['$in' => $todosId]]);
+        foreach ($todos as $todo) {
             $this->dm->remove($todo);
         }
         $this->dm->flush();
     }
 
-    public function filterByPriority($priority)
+    public function filterByStatus($status): array
     {
-        return $this->dm->getRepository(Todo::class)->findBy(['priority' => $priority]);
+        return $this->dm->getRepository(Todo::class)->findBy(['status' => $status]);
     }
 }

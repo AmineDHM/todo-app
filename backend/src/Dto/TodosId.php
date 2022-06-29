@@ -4,12 +4,12 @@ namespace App\Dto;
 
 class TodosId
 {
-    private $ids = array();
+    private array $ids = array();
     
     /**
      * Get the value of ids
      */
-    public function getIds()
+    public function getIds(): array
     {
         return $this->ids;
     }
@@ -19,7 +19,7 @@ class TodosId
      *
      * @return  self
      */
-    public function setIds($ids)
+    public function setIds(array $ids)
     {
         $this->ids = $ids;
 

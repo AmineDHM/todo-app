@@ -2,11 +2,11 @@
 
 namespace App\Document;
 
+use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\PrePersist;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @ODM\Document
+/** @ODM\Document(repositoryClass="App\Repository\TodoRepository")
  * @ODM\HasLifecycleCallbacks
  */
 class Todo
@@ -17,15 +17,17 @@ class Todo
     /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Name is required")
      */
-    private $name;
+    private string $name;
 
     /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Description is required")
      */
-    private $description;
+    private string $description;
 
-    /** @ODM\Field(type="boolean") */
-    private $done = false;
+    /** @ODM\Field(type="string") 
+     * @Assert\Choice({"todo", "in-progress", "done"}, message="Choose a valid status.")
+    */
+    private string $status = 'todo';
 
     /** @ODM\Field(type="int")
      * @Assert\NotBlank(message = "Priority is required")
@@ -35,15 +37,15 @@ class Todo
      *      notInRangeMessage = "Priority must be between {{ min }} and {{ max }}.",
      * )
      */
-    private $priority;
+    private int $priority;
 
     /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Description is required")
      */
-    private $color;
+    private string $color;
 
     /** @ODM\Field(type="date") */
-    private $createdAt;
+    private DateTime $createdAt;
 
     /**
      * Get the value of id
@@ -56,7 +58,7 @@ class Todo
     /**
      * Get the value of name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -66,7 +68,7 @@ class Todo
      *
      * @return  self
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
 
@@ -76,7 +78,7 @@ class Todo
     /**
      * Get the value of description
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -86,7 +88,7 @@ class Todo
      *
      * @return  self
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
 
@@ -94,21 +96,21 @@ class Todo
     }
 
     /**
-     * Get the value of done
+     * Get the value of status
      */
-    public function getDone()
+    public function getStatus(): string
     {
-        return $this->done;
+        return $this->status;
     }
 
     /**
-     * Set the value of done
+     * Set the value of status
      *
      * @return  self
      */
-    public function setDone($done)
+    public function setStatus(string $status)
     {
-        $this->done = $done;
+        $this->status = $status;
 
         return $this;
     }
@@ -116,7 +118,7 @@ class Todo
     /**
      * Get the value of priority
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
     }
@@ -126,7 +128,7 @@ class Todo
      *
      * @return  self
      */
-    public function setPriority($priority)
+    public function setPriority(int $priority)
     {
         $this->priority = $priority;
 
@@ -136,7 +138,7 @@ class Todo
     /**
      * Get the value of color
      */
-    public function getColor()
+    public function getColor(): string
     {
         return $this->color;
     }
@@ -146,7 +148,7 @@ class Todo
      *
      * @return  self
      */
-    public function setColor($color)
+    public function setColor(string $color)
     {
         $this->color = $color;
 
@@ -156,7 +158,7 @@ class Todo
     /**
      * Get the value of createdAt
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
@@ -166,7 +168,7 @@ class Todo
      *
      * @return  self
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
 
@@ -176,6 +178,6 @@ class Todo
     /** @ODM\PrePersist */
     public function PrePersist(): void
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
     }
 }
