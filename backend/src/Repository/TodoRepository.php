@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
+
 class TodoRepository extends DocumentRepository
 {
     public function fetchAndSortAllTodos(string $sortBy, string $order): array
@@ -11,6 +12,7 @@ class TodoRepository extends DocumentRepository
         return $this->createQueryBuilder()
             ->sort($sortBy, $order)
             ->getQuery()
-            ->execute();
+            ->execute()
+            ->toArray();
     }
 }

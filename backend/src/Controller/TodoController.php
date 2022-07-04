@@ -7,11 +7,12 @@ use App\Dto\TodosId;
 use App\Service\TodoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/todo", name="todo")
@@ -28,7 +29,7 @@ class TodoController extends AbstractController
     /**
      * @Route("", name="create", methods={"POST"})
      */
-    public function create(Request $request, SerializerInterface $serializer, ValidatorInterface $validator): Response
+    public function create(Request $request, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $todo = $serializer->deserialize($request->getContent(), Todo::class, 'json');
         $errors = $validator->validate($todo);

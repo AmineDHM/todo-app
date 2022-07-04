@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Document\Todo;
+use App\Repository\TodoRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class TodoService
@@ -24,12 +25,11 @@ class TodoService
     public function getAll(string $sortBy = null, string $order): array
     {
         if ($sortBy != null) {
-            //return $todoRepository->fetchAndSortAllTodos($sortBy, $order);
-            return $this->dm->getRepository(Todo::class)->createQueryBuilder()
-                ->sort($sortBy, $order)
-                ->getQuery()
-                ->execute()
-                ->toArray();
+            /**
+             * @var TodoRepository $repo
+             */
+            $repo = $this->dm->getRepository(Todo::class);
+            return $repo->fetchAndSortAllTodos($sortBy, $order);
         }
         return $this->dm->getRepository(Todo::class)->findAll();
     }

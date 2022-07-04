@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Document;
 
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Todo
 {
     /** @ODM\Id */
-    private $id;
+    private string $id;
 
     /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Name is required")
