@@ -8,44 +8,35 @@ import TodoForm from "./TodoForm";
 const EditTodo = () => {
   let navigate = useNavigate();
   const { id } = useParams();
-  const [todo, setTodo] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [todo, setTodo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTodo = async (id) => {
-      try {
-        const res = await fetchOneTodo(id);
-        setTodo(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    if (id) {
-      fetchTodo(id);
-    }
+    fetchOneTodo(id)
+      .then((data) => {
+        setTodo(data);
+      })
+      .catch((err) => console.log(err));
   }, [id]);
 
-  const onSubmit = async (values) => {
-    values.priority = Number(values.priority);
-    try {
-      await updateTodo(values, id);
-      navigate("/todos-list");
-    } catch (err) {
-      console.log(err);
-    }
+  const onSubmit = (values) => {
+    setLoading(true);
+    updateTodo(values, id)
+      .then(() => {
+        setLoading(false);
+        navigate("/todos-list");
+      })
+      .catch((err) => console.log(err));
   };
   return (
     <>
-      {loading && <Spinner />}
-      {!loading && (
-        <Card
-          title={<Typography.Title level={2}>Edit Todo</Typography.Title>}
-          bordered={false}
-        >
-          <TodoForm onSubmit={onSubmit} todo={todo} />
-        </Card>
-      )}
+      <Card
+        title={<Typography.Title level={2}>Edit Todo</Typography.Title>}
+        bordered={false}
+      >
+        {!todo && <Spinner />}
+        {todo && <TodoForm onSubmit={onSubmit} todo={todo} loading={loading} />}
+      </Card>
     </>
   );
 };

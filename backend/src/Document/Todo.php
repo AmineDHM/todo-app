@@ -30,15 +30,11 @@ class Todo
     */
     private string $status = 'todo';
 
-    /** @ODM\Field(type="int")
+    /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Priority is required")
-     * @Assert\Range(
-     *      min = 0,
-     *      max = 2,
-     *      notInRangeMessage = "Priority must be between {{ min }} and {{ max }}.",
-     * )
+     * @Assert\Choice({"low", "meduim", "high"}, message="Choose a valid status.")
      */
-    private int $priority;
+    private string $priority;
 
     /** @ODM\Field(type="string")
      * @Assert\NotBlank(message = "Description is required")
@@ -119,7 +115,7 @@ class Todo
     /**
      * Get the value of priority
      */
-    public function getPriority(): int
+    public function getPriority(): string
     {
         return $this->priority;
     }
@@ -129,7 +125,7 @@ class Todo
      *
      * @return  self
      */
-    public function setPriority(int $priority)
+    public function setPriority(string $priority)
     {
         $this->priority = $priority;
 

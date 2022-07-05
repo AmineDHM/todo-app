@@ -15,14 +15,14 @@ import { useNavigate } from "react-router-dom";
 
 const TodoItem = ({ todo, handleDelete }) => {
   const colors = ["green", "blue", "red"];
-  const priorityLabel = ["Low", "Meduim", "High"];
   const status = todo.status === "done" ? 0 : todo.status === "todo" ? 1 : 2;
+  const priority = todo.priority === "low" ? 0 : todo.priority === "meduim" ? 1 : 2
   const navigate = useNavigate();
 
   return (
     <Badge.Ribbon
-      text={priorityLabel[todo.priority]}
-      color={colors[todo.priority]}
+      text={todo.priority}
+      color={colors[priority]}
     >
       <Card hoverable>
         <Row>

@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from "antd";
 import React from "react";
 
-const TodoForm = ({ todo, onSubmit }) => {
+const TodoForm = ({ todo, onSubmit, loading }) => {
   return (
     <Form
       name="basic"
@@ -11,16 +11,21 @@ const TodoForm = ({ todo, onSubmit }) => {
       wrapperCol={{
         span: 8,
       }}
-      initialValues={{
-        remember: true,
-      }}
+      initialValues={
+        todo && {
+          name: todo.name,
+          description: todo.description,
+          priority: todo.priority.toString(),
+          status: todo.status,
+          color: todo.color,
+        }
+      }
       onFinish={(values) => onSubmit(values)}
       autoComplete="off"
     >
       <Form.Item
         label="Title"
         name="name"
-        initialValue={todo?.name}
         rules={[
           {
             required: true,
@@ -34,7 +39,6 @@ const TodoForm = ({ todo, onSubmit }) => {
       <Form.Item
         label="Description"
         name="description"
-        initialValue={todo?.description}
         rules={[
           {
             required: true,
@@ -48,7 +52,6 @@ const TodoForm = ({ todo, onSubmit }) => {
       <Form.Item
         label="Color"
         name="color"
-        initialValue={todo?.color}
         rules={[
           {
             required: true,
@@ -62,7 +65,6 @@ const TodoForm = ({ todo, onSubmit }) => {
       <Form.Item
         label="Priority"
         name="priority"
-        initialValue={todo?.priority}
         rules={[
           {
             required: true,
@@ -71,9 +73,9 @@ const TodoForm = ({ todo, onSubmit }) => {
         ]}
       >
         <Select>
-          <Select.Option value="0">Low</Select.Option>
-          <Select.Option value="1">Meduim</Select.Option>
-          <Select.Option value="2">High</Select.Option>
+          <Select.Option value="low">Low</Select.Option>
+          <Select.Option value="meduim">Meduim</Select.Option>
+          <Select.Option value="high">High</Select.Option>
         </Select>
       </Form.Item>
 
@@ -81,7 +83,6 @@ const TodoForm = ({ todo, onSubmit }) => {
         <Form.Item
           label="Status"
           name="status"
-          initialValue={todo?.status}
           rules={[
             {
               required: true,
@@ -103,7 +104,7 @@ const TodoForm = ({ todo, onSubmit }) => {
           span: 8,
         }}
       >
-        <Button type="primary" htmlType="submit">
+        <Button type="primary" htmlType="submit" loading={loading}>
           Submit
         </Button>
         <Button type="ghost" htmlType="reset" style={{ marginLeft: 20 }}>
